@@ -3,10 +3,14 @@ import Text from './Text';
 import { useFormik } from 'formik';
 import theme from '../theme';
 import * as yup from 'yup';
+import useSignIn from '../hooks/useSignIn';
 const initialValues = {
 	username: '',
 	password: '',
 };
+
+import { useNavigate } from 'react-router-native';
+import { useState } from 'react';
 
 const styles = StyleSheet.create({
 	item: {
@@ -53,9 +57,21 @@ const validationSchema = yup.object().shape({
 });
 
 const SignIn = () => {
-	const onSubmit = (values) => {
-		if (values.username != '' && values.password != '') {
-			console.log(values);
+	const [signIn] = useSignIn();
+	const navigate = useNavigate();
+	const [error, setError] = useState(null);
+	const onSubmit = async (values) => {
+		const { username, password } = values;
+		try {
+			await signIn({ username, password });
+			navigate('/');
+			setError(null);
+		} catch (error) {
+			console.log(error.message);
+			setError(error.message);
+			setTimeout(() => {
+				setError(null);
+			}, 2000);
 		}
 	};
 	const formik = useFormik({
@@ -83,6 +99,11 @@ const SignIn = () => {
 			/>
 			{formik.touched.password && formik.errors.password && (
 				<NativeText style={styles.error}>{formik.errors.password}</NativeText>
+			)}
+			{error && (
+				<NativeText style={[styles.error, { textAlign: 'center', fontWeight: '900', fontSize: 15 }]}>
+					{error}
+				</NativeText>
 			)}
 			<Pressable onPress={formik.handleSubmit} style={styles.signInBtn}>
 				<Text style={styles.signInText}>Sign In </Text>
