@@ -1,6 +1,7 @@
-import { Image, StyleSheet, View, Text as NativeText } from 'react-native';
+import { Image, StyleSheet, View, Text as NativeText, Pressable, Button } from 'react-native';
 import Text from './Text';
 import theme from '../theme';
+import * as Linking from 'expo-linking';
 
 const styles = StyleSheet.create({
 	container: {
@@ -16,6 +17,14 @@ const styles = StyleSheet.create({
 		paddingLeft: 20,
 		fontSize: theme.fontSizes.subheading,
 		fontWeight: theme.fontWeights.bold,
+	},
+	button: {
+		textAlign: 'center',
+		width: '100%',
+		height: 50,
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
 });
 
@@ -122,6 +131,10 @@ const CardFooter = (props) => {
 };
 
 const RepositoryItem = (props) => {
+	const openToGithub = () => {
+		Linking.openURL(props.repository.url);
+	};
+
 	return (
 		<View style={styles.container}>
 			<CardHeader
@@ -136,6 +149,13 @@ const RepositoryItem = (props) => {
 				reviews={props.repository.reviewCount}
 				rating={props.repository.ratingAverage}
 			/>
+			{props.full && (
+				<Pressable onPress={openToGithub}>
+					<View style={[cardHeaderStyles.language, styles.button]}>
+						<Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>Open in Github</Text>
+					</View>
+				</Pressable>
+			)}
 		</View>
 	);
 };
